@@ -3,5 +3,6 @@ package api
 import "github.com/gin-gonic/gin"
 
 func RegisterRoutes(r *gin.Engine) {
-	r.GET("/health", health)
+	api := r.Group("/api")
+	api.GET("/health", health)
 }
