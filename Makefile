@@ -7,7 +7,7 @@ run:
 test-backend:
 	cd backend && go test ./...
 
-tidy-backend:
+tidy:
 	cd backend && go mod tidy
 
 .PHONY: backend run test-backend tidy-backend
