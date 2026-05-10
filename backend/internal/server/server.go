@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/mlitvino/nextbite/backend/internal/api"
+	"github.com/mlitvino/nextbite/backend/internal/store"
 )
 
 type Server struct {
@@ -13,7 +14,9 @@ func New() *Server {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
 
-	api.RegisterRoutes(router)
+	userStore := store.NewMemoryUserStore()
+	handler := api.NewHandler(userStore)
+	api.RegisterRoutes(router, handler)
 	return &Server{router: router}
 }
 
