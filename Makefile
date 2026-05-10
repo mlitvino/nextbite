@@ -1,8 +1,8 @@
 backend:
-	cd backend && go build -o ./bin/nextbite .
+	cd backend && go build -o ./bin/nextbite ./cmd/nextbite
 
 run:
-	cd backend && go run .
+	cd backend && go run ./cmd/nextbite
 
 test-backend:
 	cd backend && go test ./...
@@ -10,4 +10,4 @@ test-backend:
 tidy-backend:
 	cd backend && go mod tidy
 
-.PHONY: backend run test tidy
+.PHONY: backend run test-backend tidy-backend
