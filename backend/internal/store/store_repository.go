@@ -9,7 +9,7 @@ import (
 
 var ErrStoreNotFound = errors.New("store not found")
 
-type StoreStore interface {
+type StoreRepository interface {
 	List(ctx context.Context) ([]models.Store, error)
 	Create(ctx context.Context, item models.Store) (models.Store, error)
 	GetByID(ctx context.Context, id string) (models.Store, error)

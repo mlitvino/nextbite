@@ -9,23 +9,23 @@ import (
 	"github.com/mlitvino/nextbite/backend/internal/store"
 )
 
-type StoreStore struct {
+type StoreRepository struct {
 	mu     sync.RWMutex
 	stores []models.Store
 }
 
-func NewMemoryStoreStore() *StoreStore {
-	return &StoreStore{stores: []models.Store{}}
+func NewStoreRepository() *StoreRepository {
+	return &StoreRepository{stores: []models.Store{}}
 }
 
-func (s *StoreStore) List(ctx context.Context) ([]models.Store, error) {
+func (s *StoreRepository) List(ctx context.Context) ([]models.Store, error) {
 	_ = ctx
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return append([]models.Store(nil), s.stores...), nil
 }
 
-func (s *StoreStore) Create(ctx context.Context, item models.Store) (models.Store, error) {
+func (s *StoreRepository) Create(ctx context.Context, item models.Store) (models.Store, error) {
 	_ = ctx
 	if item.ID == "" {
 		item.ID = uuid.NewString()
@@ -36,7 +36,7 @@ func (s *StoreStore) Create(ctx context.Context, item models.Store) (models.Stor
 	return item, nil
 }
 
-func (s *StoreStore) GetByID(ctx context.Context, id string) (models.Store, error) {
+func (s *StoreRepository) GetByID(ctx context.Context, id string) (models.Store, error) {
 	_ = ctx
 	s.mu.RLock()
 	defer s.mu.RUnlock()

@@ -15,22 +15,22 @@ type authUser struct {
 	passwordHash []byte
 }
 
-type AuthStore struct {
+type AuthRepository struct {
 	mu         sync.RWMutex
 	byUsername map[string]authUser
 	byID       map[string]models.User
 	sessions   map[string]string
 }
 
-func NewMemoryAuthStore() *AuthStore {
-	return &AuthStore{
+func NewMemoryAuthRepository() *AuthRepository {
+	return &AuthRepository{
 		byUsername: make(map[string]authUser),
 		byID:       make(map[string]models.User),
 		sessions:   make(map[string]string),
 	}
 }
 
-func (s *AuthStore) StoreCredentials(ctx context.Context, user models.User, password string) error {
+func (s *AuthRepository) StoreCredentials(ctx context.Context, user models.User, password string) error {
 	_ = ctx
 	if user.ID == "" || user.Username == "" || password == "" {
 		return store.ErrInvalidCredentials
@@ -52,7 +52,7 @@ func (s *AuthStore) StoreCredentials(ctx context.Context, user models.User, pass
 	return nil
 }
 
-func (s *AuthStore) Authenticate(ctx context.Context, username, password string) (models.User, error) {
+func (s *AuthRepository) Authenticate(ctx context.Context, username, password string) (models.User, error) {
 	_ = ctx
 	s.mu.RLock()
 	entry, ok := s.byUsername[username]
@@ -68,7 +68,7 @@ func (s *AuthStore) Authenticate(ctx context.Context, username, password string)
 	return entry.user, nil
 }
 
-func (s *AuthStore) CreateSession(ctx context.Context, userID string) (string, error) {
+func (s *AuthRepository) CreateSession(ctx context.Context, userID string) (string, error) {
 	_ = ctx
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -81,7 +81,7 @@ func (s *AuthStore) CreateSession(ctx context.Context, userID string) (string, e
 	return token, nil
 }
 
-func (s *AuthStore) GetUserBySession(ctx context.Context, token string) (models.User, error) {
+func (s *AuthRepository) GetUserBySession(ctx context.Context, token string) (models.User, error) {
 	_ = ctx
 	s.mu.RLock()
 	userID, ok := s.sessions[token]
@@ -98,7 +98,7 @@ func (s *AuthStore) GetUserBySession(ctx context.Context, token string) (models.
 	return user, nil
 }
 
-func (s *AuthStore) DeleteSession(ctx context.Context, token string) error {
+func (s *AuthRepository) DeleteSession(ctx context.Context, token string) error {
 	_ = ctx
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -14,7 +14,7 @@ var (
 	ErrUserExists         = errors.New("user already exists")
 )
 
-type AuthStore interface {
+type AuthRepository interface {
 	Authenticate(ctx context.Context, username, password string) (models.User, error)
 	CreateSession(ctx context.Context, userID string) (string, error)
 	GetUserBySession(ctx context.Context, token string) (models.User, error)
