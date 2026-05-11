@@ -51,6 +51,19 @@
   gap: 8px;
 }
 
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.welcome-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
 .field-input {
   border-radius: 10px;
   border: 1px solid var(--panel-border);

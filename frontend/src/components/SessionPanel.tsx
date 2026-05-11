@@ -13,6 +13,7 @@ function SessionPanel() {
   const [status, setStatus] = useState<Status>('idle')
   const [message, setMessage] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [displayName, setDisplayName] = useState('')
 
   const handleChange = (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }))
@@ -33,6 +34,7 @@ function SessionPanel() {
       setStatus('ready')
       setMessage(`Signed in as ${user.name || user.username}.`)
       setIsLoggedIn(true)
+      setDisplayName(user.name || user.username)
       setForm({ username: '', password: '' })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed.'
@@ -56,6 +58,7 @@ function SessionPanel() {
       setStatus('ready')
       setMessage(`Signed in as ${user.name || user.username}.`)
       setIsLoggedIn(true)
+      setDisplayName(user.name || user.username)
       setForm({ username: '', password: '' })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Signup failed.'
@@ -72,6 +75,7 @@ function SessionPanel() {
       setStatus('idle')
       setMessage('Signed out.')
       setIsLoggedIn(false)
+      setDisplayName('')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Logout failed.'
       setStatus('error')
@@ -81,42 +85,48 @@ function SessionPanel() {
 
   return (
     <aside className="corner" aria-label="Authentication">
-      <div className={`log-box status-${status}`} aria-live="polite">
-        <p className="log-line">{message || 'Sign in to continue.'}</p>
-      </div>
-      <form className="login-form" onSubmit={handleLogin}>
-        <input
-          className="field-input"
-          type="text"
-          name="username"
-          autoComplete="username"
-          placeholder="Username"
-          value={form.username}
-          onChange={handleChange('username')}
-        />
-        <input
-          className="field-input"
-          type="password"
-          name="password"
-          autoComplete="current-password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange('password')}
-        />
-        <div className="actions">
-          <button type="submit" className="primary" disabled={status === 'loading'}>
-            Login
+      {isLoggedIn ? (
+        <div className="welcome">
+          <p className="welcome-text">Welcome, {displayName}!</p>
+          <button type="button" className="logout" onClick={handleLogout} disabled={status === 'loading'}>
+            Logout
           </button>
-          <button type="button" className="secondary" onClick={handleSignup} disabled={status === 'loading'}>
-            Signup
-          </button>
-          {isLoggedIn ? (
-            <button type="button" className="logout" onClick={handleLogout} disabled={status === 'loading'}>
-              Logout
-            </button>
-          ) : null}
         </div>
-      </form>
+      ) : (
+        <>
+          <div className={`log-box status-${status}`} aria-live="polite">
+            <p className="log-line">{message || 'Sign in to continue.'}</p>
+          </div>
+          <form className="login-form" onSubmit={handleLogin}>
+            <input
+              className="field-input"
+              type="text"
+              name="username"
+              autoComplete="username"
+              placeholder="Username"
+              value={form.username}
+              onChange={handleChange('username')}
+            />
+            <input
+              className="field-input"
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange('password')}
+            />
+            <div className="actions">
+              <button type="submit" className="primary" disabled={status === 'loading'}>
+                Login
+              </button>
+              <button type="button" className="secondary" onClick={handleSignup} disabled={status === 'loading'}>
+                Signup
+              </button>
+            </div>
+          </form>
+        </>
+      )}
     </aside>
   )
 }
