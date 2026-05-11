@@ -10,7 +10,7 @@ type Config struct {
 }
 
 func Load() (Config, error) {
-	port, err := requireEnv("PORT")
+	port, err := requireEnv("BACKEND_PORT")
 	if err != nil {
 		return Config{}, err
 	}
