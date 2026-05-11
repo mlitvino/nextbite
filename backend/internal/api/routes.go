@@ -7,7 +7,8 @@ func RegisterRoutes(r *gin.Engine, h *Handler) {
 	api.GET("/health", health)
 	api.GET("/users", h.GetUsers)
 	api.POST("/users", h.PostUsers)
-	api.POST("/login", h.PostLogin)
-	api.POST("/logout", h.PostLogout)
+	api.POST("/auth/signup", h.PostSignup)
+	api.POST("/auth/login", h.PostLogin)
+	api.POST("/auth/logout", h.PostLogout)
 	api.GET("/me", h.RequireAuth(), h.GetMe)
 }

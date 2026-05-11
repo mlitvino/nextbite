@@ -34,6 +34,14 @@ type createUserRequest struct {
 }
 
 func (h *Handler) PostUsers(c *gin.Context) {
+	h.handleSignup(c)
+}
+
+func (h *Handler) PostSignup(c *gin.Context) {
+	h.handleSignup(c)
+}
+
+func (h *Handler) handleSignup(c *gin.Context) {
 	var req createUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
