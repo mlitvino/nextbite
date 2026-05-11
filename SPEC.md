@@ -1,120 +1,100 @@
 # NextBite Recommendation Engine - Technical Spec
 
 ## Overview
-NextBite is a backend recommendation system that ranks and suggests restaurants based on user preferences and contextual signals. The system focuses on low-latency, scalable scoring, and real-time updates using concurrent processing in Go.
+NextBite is a backend recommendation service that ranks and suggests menu items for users based on lightweight, heuristic signals. The MVP focuses on fast, deterministic ranking and clear extensibility, not ML training.
 
 ## Goals
-- Deliver personalized restaurant rankings with low latency.
-- Scale to large datasets using bounded concurrency.
-- Support real-time updates when data or preferences change.
-- Provide a modular scoring framework for adding new signals.
+- Deliver personalized item rankings with low latency.
+- Keep scoring logic modular so new signals can be added safely.
+- Provide a simple candidate generation and ranking pipeline.
+- Stay deterministic for the same inputs.
 
 ## Non-Goals
 - UI or frontend delivery.
-- Full data ingestion from external providers (defined as integrations only).
-- Machine learning model training (heuristic and rule-based scoring only).
+- Machine learning model training.
+- Real-time streaming updates (batch or request-time computation only).
 
 ## Functional Requirements
-- Accept user preference profiles (cuisine, price, ambiance, style, dietary needs).
-- Rank restaurants using multiple signals (preference match, popularity, context).
-- Provide top-N recommendations with stable ordering rules.
-- Support streaming or event-driven updates to rankings.
-- Expose REST endpoints for recommendation queries.
+- Accept authenticated requests and identify the current user via session.
+- Generate a candidate set using simple heuristics (popular, recent, category matched).
+- Rank candidates using weighted signals.
+- Return top-N recommendations with stable ordering rules.
+- Expose REST endpoints for recommendations and auth flows.
 
 ## Non-Functional Requirements
-- P50 latency under 100ms, P95 under 250ms for top-N requests.
-- Throughput target: 1k requests/sec per instance.
-- Bounded memory growth for large restaurant catalogs.
+- P50 latency under 100ms, P95 under 250ms for top-N requests in the MVP.
 - Deterministic results for the same inputs.
-- Graceful degradation if optional signals are missing.
+- Bounded memory growth for in-memory catalogs.
+- Graceful behavior when signals are missing.
 
 ## Constraints and Limitations
-- Data freshness depends on ingestion frequency.
-- Real-time updates require event sources; without them, batch refreshes are used.
+- Data freshness depends on the update strategy (batch or request-time).
 - Scoring remains heuristic unless ML services are introduced.
-- Restaurant catalogs must fit within memory budgets or use paging.
+- Large catalogs may require pagination or external storage.
 
 ## Architecture
 ### High-Level Components
-- API Layer: REST endpoints for request handling and response formatting.
-- Scoring Engine: modular signal calculators and score aggregation.
-- Worker Pool: bounded concurrency for scoring large datasets.
-- Aggregation Layer: top-N selection and ordering.
-- Event Pipeline: optional streaming updates for data changes.
-
-### Concurrency Model
-- Fan-out/fan-in using goroutines with a bounded worker pool.
-- Channels for job distribution and result collection.
-- Context cancellation for request timeouts.
+- API Layer: Gin handlers for request parsing and response shaping.
+- Recommendation Service: candidate generation + scoring + ranking.
+- Store Layer: data access for items, users, and interactions.
 
 ### Data Flow
-1. Receive request with user profile and context.
-2. Build a scoring job list for candidate restaurants.
-3. Fan-out to workers for signal scoring.
-4. Aggregate weighted scores.
-5. Select top-N and return results.
+1. Receive request with user session.
+2. Build candidate set (union of popular, recent, category matched, or user history).
+3. Score candidates with weighted signals.
+4. Sort and return top-N with stable tiebreakers.
 
 ## Scoring and Ranking
-### Signals
-- Preference match (cuisine, price, style).
-- Popularity (ratings, reviews, visit count).
-- Context (time of day, location, availability).
+### Initial Signals (MVP)
+- Popularity (orders or views over a recent window).
+- Category affinity (user preference inferred from history).
+- Freshness (newer items are boosted).
 
-### Score Aggregation
+### Aggregation
 - Weighted sum with configurable weights.
-- Per-signal normalization to comparable scales.
-- Tie-breakers: distance, popularity, stable ID.
+- Stable tiebreakers: score, popularity, item ID.
 
-## API Specification (Initial)
-- GET /recommendations
-  - Query params: userId, lat, lon, limit
-  - Response: list of restaurant IDs with scores and metadata
-- POST /preferences
-  - Body: user preferences profile
-  - Response: success status and version ID
+## API Specification (Current + Planned)
+- POST /api/auth/signup
+  - Body: {name, username, password}
+  - Response: created user
+- POST /api/auth/login
+  - Body: {username, password}
+  - Response: user + session cookie
+- POST /api/auth/logout
+  - Response: {status: "ok"}
+- GET /api/me
+  - Response: current user
+- GET /api/recommendations (planned)
+  - Query params: limit, context
+  - Response: list of items with scores and metadata
 
 ## Data Model (Logical)
-- UserProfile: preferences, dietary needs, budget range.
-- Restaurant: cuisine tags, price tier, rating, geo, metadata.
-- Context: time, location, device, session attributes.
+- User: id, name, username
+- Item: id, name, category, price, created_at
+- Interaction: user_id, item_id, type, ts
+- ItemStats (optional): item_id, orders_7d, views_7d
 
 ## Possible Implementations
-### In-Memory Scoring
-- Load restaurant catalog into memory.
-- Use concurrent scoring and top-N heap selection.
+### In-Memory MVP
+- Load items and recent stats into memory.
+- Generate candidates from simple lists.
+- Score and sort in memory.
 
-### Partitioned Scoring
-- Partition restaurants by region.
-- Parallelize across partitions and merge top-N.
-
-### Stream Updates
-- Use a message broker to ingest updates.
-- Trigger partial re-score for impacted subsets.
+### Store-Backed
+- Move items/interactions to a database.
+- Cache hot stats in memory.
 
 ## Tools and Dependencies
-### Language and Runtime
-- Go 1.22+ recommended.
-
-### Libraries (Candidates)
-- net/http or chi for HTTP routing.
-- context for request cancellation.
-- sync and channels for concurrency.
-
-### Observability
-- OpenTelemetry for traces and metrics.
-- Prometheus client for metrics export.
-
-## Third-Party Integrations (Optional)
-- Maps/Geo provider for distance and travel time.
-- Review platform for popularity and ratings.
-- Message broker (Kafka, NATS, or RabbitMQ) for events.
+- Go 1.22+
+- Gin for HTTP routing
+- context, sync for request cancellation and concurrency control
 
 ## Testing Strategy
-- Unit tests for signal calculators and aggregation.
-- Concurrency tests to validate worker pool behavior.
-- Load tests for latency and throughput targets.
+- Unit tests for each signal and aggregation.
+- Integration tests for recommendation endpoint.
 
 ## Open Questions
-- What is the initial data source and refresh interval?
-- What are the default signal weights?
-- What is the desired response shape for the API?
+- What items and interactions are available initially?
+- What weights should be used in the first release?
+- How large is the expected item catalog?
