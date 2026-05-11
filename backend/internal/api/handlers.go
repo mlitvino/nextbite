@@ -29,7 +29,7 @@ func (h *Handler) GetUsers(c *gin.Context) {
 
 type createUserRequest struct {
 	Name     string `json:"name"`
-	Email    string `json:"email"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
@@ -39,14 +39,14 @@ func (h *Handler) PostUsers(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
 		return
 	}
-	if req.Name == "" || req.Email == "" || req.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "name, email, and password are required"})
+	if req.Name == "" || req.Username == "" || req.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "name, username, and password are required"})
 		return
 	}
 
 	created, err := h.users.Create(c.Request.Context(), models.User{
-		Name:  req.Name,
-		Email: req.Email,
+		Name:     req.Name,
+		Username: req.Username,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
@@ -62,12 +62,12 @@ func (h *Handler) PostUsers(c *gin.Context) {
 }
 
 type loginRequest struct {
-	Email    string `json:"email"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 const (
-	cookieName         = "nextbite_session"
+	cookieName          = "nextbite_session"
 	cookieMaxAgeSeconds = 3600
 )
 
@@ -77,12 +77,12 @@ func (h *Handler) PostLogin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
 		return
 	}
-	if req.Email == "" || req.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "email and password are required"})
+	if req.Username == "" || req.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "username and password are required"})
 		return
 	}
 
-	user, err := h.auth.Authenticate(c.Request.Context(), req.Email, req.Password)
+	user, err := h.auth.Authenticate(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return

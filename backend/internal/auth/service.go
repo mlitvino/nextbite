@@ -19,8 +19,8 @@ func (s *Service) StoreCredentials(ctx context.Context, user models.User, passwo
 	return s.store.StoreCredentials(ctx, user, password)
 }
 
-func (s *Service) Authenticate(ctx context.Context, email, password string) (models.User, error) {
-	return s.store.Authenticate(ctx, email, password)
+func (s *Service) Authenticate(ctx context.Context, username, password string) (models.User, error) {
+	return s.store.Authenticate(ctx, username, password)
 }
 
 func (s *Service) CreateSession(ctx context.Context, userID string) (string, error) {

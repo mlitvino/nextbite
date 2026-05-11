@@ -16,23 +16,23 @@ type authUser struct {
 }
 
 type AuthStore struct {
-	mu       sync.RWMutex
-	byEmail  map[string]authUser
-	byID     map[string]models.User
-	sessions map[string]string
+	mu         sync.RWMutex
+	byUsername map[string]authUser
+	byID       map[string]models.User
+	sessions   map[string]string
 }
 
 func NewMemoryAuthStore() *AuthStore {
 	return &AuthStore{
-		byEmail:  make(map[string]authUser),
-		byID:     make(map[string]models.User),
-		sessions: make(map[string]string),
+		byUsername: make(map[string]authUser),
+		byID:       make(map[string]models.User),
+		sessions:   make(map[string]string),
 	}
 }
 
 func (s *AuthStore) StoreCredentials(ctx context.Context, user models.User, password string) error {
 	_ = ctx
-	if user.ID == "" || user.Email == "" || password == "" {
+	if user.ID == "" || user.Username == "" || password == "" {
 		return store.ErrInvalidCredentials
 	}
 
@@ -43,19 +43,19 @@ func (s *AuthStore) StoreCredentials(ctx context.Context, user models.User, pass
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, exists := s.byEmail[user.Email]; exists {
+	if _, exists := s.byUsername[user.Username]; exists {
 		return store.ErrUserExists
 	}
-	s.byEmail[user.Email] = authUser{user: user, passwordHash: hash}
+	s.byUsername[user.Username] = authUser{user: user, passwordHash: hash}
 	s.byID[user.ID] = user
 
 	return nil
 }
 
-func (s *AuthStore) Authenticate(ctx context.Context, email, password string) (models.User, error) {
+func (s *AuthStore) Authenticate(ctx context.Context, username, password string) (models.User, error) {
 	_ = ctx
 	s.mu.RLock()
-	entry, ok := s.byEmail[email]
+	entry, ok := s.byUsername[username]
 	s.mu.RUnlock()
 	if !ok {
 		return models.User{}, store.ErrInvalidCredentials
