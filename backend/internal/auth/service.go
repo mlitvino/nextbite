@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/mlitvino/nextbite/backend/internal/models"
-	"github.com/mlitvino/nextbite/backend/internal/store"
+	store "github.com/mlitvino/nextbite/backend/internal/repository"
 )
 
 type Service struct {

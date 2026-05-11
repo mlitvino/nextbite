@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/mlitvino/nextbite/backend/internal/store"
+import store "github.com/mlitvino/nextbite/backend/internal/repository"
 
 var (
 	ErrInvalidCredentials = store.ErrInvalidCredentials

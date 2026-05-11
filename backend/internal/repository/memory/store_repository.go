@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mlitvino/nextbite/backend/internal/models"
-	"github.com/mlitvino/nextbite/backend/internal/store"
+	store "github.com/mlitvino/nextbite/backend/internal/repository"
 )
 
 type StoreRepository struct {

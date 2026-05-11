@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/mlitvino/nextbite/backend/internal/api"
-	"github.com/mlitvino/nextbite/backend/internal/store"
-	"github.com/mlitvino/nextbite/backend/internal/store/memory"
+	"github.com/mlitvino/nextbite/backend/internal/repository"
+	"github.com/mlitvino/nextbite/backend/internal/repository/memory"
 )
 
 type Server struct {
