@@ -45,7 +45,7 @@ All endpoints are under `/api`.
 - `GET /api/users`
 	- Returns `{ "items": [] }`
 - `POST /api/users`
-	- Body: `{ "name": "...", "email": "..." }`
+	- Body: `{ "name": "...", "username": "..." }`
 	- Validates that both fields are non-empty
 
 ## Development Notes
