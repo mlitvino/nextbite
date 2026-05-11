@@ -9,7 +9,7 @@ import (
 
 type UserStore interface {
 	List(ctx context.Context) ([]models.User, error)
-	Create(ctx context.Context, name, email string) (models.User, error)
+	Create(ctx context.Context, user models.User) (models.User, error)
 }
 
 type MemoryUserStore struct {
@@ -25,12 +25,10 @@ func (s *MemoryUserStore) List(ctx context.Context) ([]models.User, error) {
 	return s.users, nil
 }
 
-func (s *MemoryUserStore) Create(ctx context.Context, name, email string) (models.User, error) {
+func (s *MemoryUserStore) Create(ctx context.Context, user models.User) (models.User, error) {
 	_ = ctx
-	user := models.User{
-		ID:    uuid.NewString(),
-		Name:  name,
-		Email: email,
+	if user.ID == "" {
+		user.ID = uuid.NewString()
 	}
 	s.users = append(s.users, user)
 	return user, nil

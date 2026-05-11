@@ -15,8 +15,11 @@ func New() *Server {
 	router.Use(gin.Logger(), gin.Recovery())
 
 	userStore := store.NewMemoryUserStore()
-	handler := api.NewHandler(userStore)
+	authStore := store.NewMemoryAuthStore()
+
+	handler := api.NewHandler(userStore, authStore)
 	api.RegisterRoutes(router, handler)
+
 	return &Server{router: router}
 }
 
