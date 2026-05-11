@@ -15,6 +15,12 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port,
+      proxy: {
+        '/api': {
+          target: `http://localhost:${env.BACKEND_PORT || '3000'}`,
+          changeOrigin: true,
+        },
+      },
     },
   }
 })
