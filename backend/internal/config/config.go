@@ -6,7 +6,8 @@ import (
 )
 
 type Config struct {
-	Port string
+	Port         string
+	StoreSeedCSV string
 }
 
 func Load() (Config, error) {
@@ -15,7 +16,12 @@ func Load() (Config, error) {
 		return Config{}, err
 	}
 
-	return Config{Port: port}, nil
+	storeSeedCSV, err := requireEnv("STORE_SEED_CSV")
+	if err != nil {
+		return Config{}, err
+	}
+
+	return Config{Port: port, StoreSeedCSV: storeSeedCSV}, nil
 }
 
 func requireEnv(key string) (string, error) {

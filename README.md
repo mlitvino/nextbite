@@ -26,7 +26,7 @@ backend/
 	internal/api/       # routes and handlers
 	internal/server/    # HTTP wiring and middleware
 	internal/models/    # domain models
-	internal/store/     # persistence interfaces and implementations
+	internal/repository/     # persistence interfaces and implementations
 ```
 
 ## Build and Run

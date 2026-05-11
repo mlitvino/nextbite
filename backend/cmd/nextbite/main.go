@@ -9,17 +9,17 @@ import (
 )
 
 func main() {
-    if err := godotenv.Load("../.env"); err != nil {
-        log.Fatal(err)
-    }
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatal(err)
+	}
 
-    cfg, err := config.Load()
-    if err != nil {
-        log.Fatal(err)
-    }
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    srv := server.New()
-    if err := srv.Run(":" + cfg.Port); err != nil {
-        log.Fatal(err)
-    }
+	srv := server.New(cfg)
+	if err := srv.Run(":" + cfg.Port); err != nil {
+		log.Fatal(err)
+	}
 }
