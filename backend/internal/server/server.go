@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mlitvino/nextbite/backend/internal/api"
 	"github.com/mlitvino/nextbite/backend/internal/store"
+	"github.com/mlitvino/nextbite/backend/internal/store/memory"
 )
 
 type Server struct {
@@ -15,7 +16,7 @@ func New() *Server {
 	router.Use(gin.Logger(), gin.Recovery())
 
 	userStore := store.NewMemoryUserStore()
-	authStore := store.NewMemoryAuthStore()
+	authStore := memory.NewMemoryAuthStore()
 
 	handler := api.NewHandler(userStore, authStore)
 	api.RegisterRoutes(router, handler)
