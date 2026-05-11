@@ -47,3 +47,30 @@ func (s *StoreRepository) GetByID(ctx context.Context, id string) (models.Store,
 	}
 	return models.Store{}, store.ErrStoreNotFound
 }
+
+func (s *StoreRepository) Update(ctx context.Context, id string, item models.Store) (models.Store, error) {
+	_ = ctx
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.stores {
+		if s.stores[i].ID == id {
+			item.ID = id
+			s.stores[i] = item
+			return item, nil
+		}
+	}
+	return models.Store{}, store.ErrStoreNotFound
+}
+
+func (s *StoreRepository) Delete(ctx context.Context, id string) error {
+	_ = ctx
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.stores {
+		if s.stores[i].ID == id {
+			s.stores = append(s.stores[:i], s.stores[i+1:]...)
+			return nil
+		}
+	}
+	return store.ErrStoreNotFound
+}

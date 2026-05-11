@@ -17,8 +17,9 @@ func New() *Server {
 
 	userStore := store.NewMemoryUserRepository()
 	authStore := memory.NewMemoryAuthRepository()
+	storeRepo := memory.NewStoreRepository()
 
-	handler := api.NewHandler(userStore, authStore)
+	handler := api.NewHandler(userStore, authStore, storeRepo)
 	api.RegisterRoutes(router, handler)
 
 	return &Server{router: router}
