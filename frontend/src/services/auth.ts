@@ -1,21 +1,6 @@
+import type { LoginPayload, SignupPayload, User } from '../types/auth'
+
 const API_BASE = '/api'
-
-type LoginPayload = {
-  username: string
-  password: string
-}
-
-type SignupPayload = {
-  name: string
-  username: string
-  password: string
-}
-
-type User = {
-  id: string
-  name: string
-  username: string
-}
 
 export async function login(payload: LoginPayload): Promise<User> {
   const response = await fetch(`${API_BASE}/auth/login`, {
