@@ -35,4 +35,5 @@ func registerAuthRoutes(r gin.IRoutes, h *handlers.Handler) {
 	r.POST("/auth/login", BindJSON[handlers.LoginRequest](handlers.LoginRequestKey), h.PostLogin)
 	r.POST("/auth/logout", h.PostLogout)
 	r.GET("/me", h.RequireAuth(), h.GetMe)
+	r.GET("/me/recommendations", h.RequireAuth(), h.GetMyRecommendations)
 }
