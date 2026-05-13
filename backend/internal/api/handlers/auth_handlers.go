@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/mlitvino/nextbite/backend/internal/models"
 )
 
-type loginRequest struct {
+type LoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
@@ -15,7 +15,7 @@ type loginRequest struct {
 const (
 	cookieName          = "nextbite_session"
 	cookieMaxAgeSeconds = 3600
-	loginRequestKey     = "loginRequest"
+	LoginRequestKey     = "loginRequest"
 )
 
 func (h *Handler) PostSignup(c *gin.Context) {
@@ -70,17 +70,17 @@ func (h *Handler) GetMe(c *gin.Context) {
 	c.JSON(http.StatusOK, current)
 }
 
-func getLoginRequest(c *gin.Context) (loginRequest, bool) {
-	value, ok := c.Get(loginRequestKey)
+func getLoginRequest(c *gin.Context) (LoginRequest, bool) {
+	value, ok := c.Get(LoginRequestKey)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "missing login request"})
-		return loginRequest{}, false
+		return LoginRequest{}, false
 	}
 
-	req, ok := value.(loginRequest)
+	req, ok := value.(LoginRequest)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid login request"})
-		return loginRequest{}, false
+		return LoginRequest{}, false
 	}
 
 	return req, true

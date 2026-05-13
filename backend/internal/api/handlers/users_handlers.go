@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"net/http"
@@ -7,13 +7,13 @@ import (
 	"github.com/mlitvino/nextbite/backend/internal/models"
 )
 
-type createUserRequest struct {
+type CreateUserRequest struct {
 	Name     string `json:"name" binding:"required"`
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
-const createUserRequestKey = "createUserRequest"
+const CreateUserRequestKey = "createUserRequest"
 
 func (h *Handler) GetUsers(c *gin.Context) {
 	items, err := h.users.List(c.Request.Context())
@@ -52,17 +52,17 @@ func (h *Handler) handleSignup(c *gin.Context) {
 	c.JSON(http.StatusCreated, created)
 }
 
-func getCreateUserRequest(c *gin.Context) (createUserRequest, bool) {
-	value, ok := c.Get(createUserRequestKey)
+func getCreateUserRequest(c *gin.Context) (CreateUserRequest, bool) {
+	value, ok := c.Get(CreateUserRequestKey)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "missing create user request"})
-		return createUserRequest{}, false
+		return CreateUserRequest{}, false
 	}
 
-	req, ok := value.(createUserRequest)
+	req, ok := value.(CreateUserRequest)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid create user request"})
-		return createUserRequest{}, false
+		return CreateUserRequest{}, false
 	}
 
 	return req, true

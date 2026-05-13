@@ -1,7 +1,7 @@
-package api
+package handlers
 
 import (
-	"github.com/mlitvino/nextbite/backend/internal/repository"
+	store "github.com/mlitvino/nextbite/backend/internal/repository"
 )
 
 type Handler struct {

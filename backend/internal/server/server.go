@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mlitvino/nextbite/backend/internal/api"
+	"github.com/mlitvino/nextbite/backend/internal/api/handlers"
 	"github.com/mlitvino/nextbite/backend/internal/config"
 	"github.com/mlitvino/nextbite/backend/internal/repository"
 	"github.com/mlitvino/nextbite/backend/internal/repository/memory"
@@ -25,7 +26,7 @@ func New(cfg config.Config) *Server {
 		log.Printf("store seed load failed: %v", err)
 	}
 
-	handler := api.NewHandler(userStore, authStore, storeRepo)
+	handler := handlers.NewHandler(userStore, authStore, storeRepo)
 	api.RegisterRoutes(router, handler)
 
 	return &Server{router: router}

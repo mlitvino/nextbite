@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"net/http"
@@ -6,10 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mlitvino/nextbite/backend/internal/models"
-	store "github.com/mlitvino/nextbite/backend/internal/repository"
+	"github.com/mlitvino/nextbite/backend/internal/repository"
 )
 
-type storeRequest struct {
+type StoreRequest struct {
 	Name           string     `json:"name" binding:"required"`
 	PrimaryCuisine string     `json:"primary_cuisine" binding:"required"`
 	Cuisines       []string   `json:"cuisines"`
@@ -23,8 +23,8 @@ type storeRequest struct {
 }
 
 const (
-	storeRequestKey = "storeRequest"
-	storeIDKey      = "storeID"
+	StoreRequestKey = "storeRequest"
+	StoreIDKey      = "storeID"
 )
 
 func (h *Handler) GetStores(c *gin.Context) {
@@ -156,22 +156,22 @@ func (h *Handler) DeleteStore(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
-func getStoreRequest(c *gin.Context) (storeRequest, bool) {
-	value, ok := c.Get(storeRequestKey)
+func getStoreRequest(c *gin.Context) (StoreRequest, bool) {
+	value, ok := c.Get(StoreRequestKey)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "missing store request"})
-		return storeRequest{}, false
+		return StoreRequest{}, false
 	}
-	req, ok := value.(storeRequest)
+	req, ok := value.(StoreRequest)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid store request"})
-		return storeRequest{}, false
+		return StoreRequest{}, false
 	}
 	return req, true
 }
 
 func getStoreID(c *gin.Context) (string, bool) {
-	value, ok := c.Get(storeIDKey)
+	value, ok := c.Get(StoreIDKey)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "missing store id"})
 		return "", false
