@@ -7,53 +7,19 @@ import (
 	"github.com/mlitvino/nextbite/backend/internal/models"
 )
 
-type createUserRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
 type loginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 const (
-	cookieName           = "nextbite_session"
-	cookieMaxAgeSeconds  = 3600
-	createUserRequestKey = "createUserRequest"
-	loginRequestKey      = "loginRequest"
+	cookieName          = "nextbite_session"
+	cookieMaxAgeSeconds = 3600
+	loginRequestKey     = "loginRequest"
 )
-
-func (h *Handler) PostUsers(c *gin.Context) {
-	h.handleSignup(c)
-}
 
 func (h *Handler) PostSignup(c *gin.Context) {
 	h.handleSignup(c)
-}
-
-func (h *Handler) handleSignup(c *gin.Context) {
-	req, ok := getCreateUserRequest(c)
-	if !ok {
-		return
-	}
-
-	created, err := h.users.Create(c.Request.Context(), models.User{
-		Name:     req.Name,
-		Username: req.Username,
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
-		return
-	}
-
-	if err := h.auth.StoreCredentials(c.Request.Context(), created, req.Password); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, created)
 }
 
 func (h *Handler) PostLogin(c *gin.Context) {
@@ -102,22 +68,6 @@ func (h *Handler) GetMe(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, current)
-}
-
-func getCreateUserRequest(c *gin.Context) (createUserRequest, bool) {
-	value, ok := c.Get(createUserRequestKey)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "missing create user request"})
-		return createUserRequest{}, false
-	}
-
-	req, ok := value.(createUserRequest)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid create user request"})
-		return createUserRequest{}, false
-	}
-
-	return req, true
 }
 
 func getLoginRequest(c *gin.Context) (loginRequest, bool) {
