@@ -5,7 +5,7 @@ frontend:
 	cd frontend && npm install
 
 run-backend:
-	cd backend && go run ./cmd/nextbite
+	cd backend && air
 
 run-frontend:
 	cd frontend && npm run dev

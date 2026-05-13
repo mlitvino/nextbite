@@ -1,0 +1,16 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o tmp/main ./cmd/nextbite"
+  bin = "tmp/main"
+  include_ext = ["go", "tmpl", "tpl", "html"]
+  exclude_dir = ["tmp", "vendor"]
+  delay = 1000
+
+[log]
+  time = true
+
+[run]
+  cmd = "./tmp/main"
+  restart_delay = 200
