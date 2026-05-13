@@ -135,6 +135,16 @@
   color: var(--text);
 }
 
+.store-status {
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px dashed var(--panel-border);
+  background: var(--panel-muted);
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .corner {
   position: static;
   width: min(260px, 100%);
