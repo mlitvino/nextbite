@@ -11,7 +11,6 @@ type FormState = {
 function SessionPanel() {
   const [form, setForm] = useState<FormState>({ username: '', password: '' })
   const [status, setStatus] = useState<Status>('idle')
-  const [message, setMessage] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [displayName, setDisplayName] = useState('')
 
@@ -23,63 +22,49 @@ function SessionPanel() {
     event.preventDefault()
     if (!form.username || !form.password) {
       setStatus('error')
-      setMessage('Username and password are required.')
       return
     }
 
     setStatus('loading')
-    setMessage('Signing in...')
     try {
       const user = await login({ username: form.username, password: form.password })
       setStatus('ready')
-      setMessage(`Signed in as ${user.name || user.username}.`)
       setIsLoggedIn(true)
       setDisplayName(user.name || user.username)
       setForm({ username: '', password: '' })
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login failed.'
       setStatus('error')
-      setMessage(message)
     }
   }
 
   const handleSignup = async () => {
     if (!form.username || !form.password) {
       setStatus('error')
-      setMessage('Username and password are required.')
       return
     }
 
     setStatus('loading')
-    setMessage('Creating account...')
     try {
       await signup({ name: form.username, username: form.username, password: form.password })
       const user = await login({ username: form.username, password: form.password })
       setStatus('ready')
-      setMessage(`Signed in as ${user.name || user.username}.`)
       setIsLoggedIn(true)
       setDisplayName(user.name || user.username)
       setForm({ username: '', password: '' })
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Signup failed.'
       setStatus('error')
-      setMessage(message)
     }
   }
 
   const handleLogout = async () => {
     setStatus('loading')
-    setMessage('Signing out...')
     try {
       await logout()
       setStatus('idle')
-      setMessage('Signed out.')
       setIsLoggedIn(false)
       setDisplayName('')
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Logout failed.'
       setStatus('error')
-      setMessage(message)
     }
   }
 
@@ -94,9 +79,6 @@ function SessionPanel() {
         </div>
       ) : (
         <>
-          <div className={`log-box status-${status}`} aria-live="polite">
-            <p className="log-line">{message || 'Sign in to continue.'}</p>
-          </div>
           <form className="login-form" onSubmit={handleLogin}>
             <input
               className="field-input"
