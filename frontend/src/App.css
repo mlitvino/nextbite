@@ -5,10 +5,6 @@
   grid-template-rows: auto 1fr;
   gap: 32px;
   padding: 32px clamp(20px, 4vw, 64px) 64px;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(248, 244, 235, 0.9), transparent 48%),
-    radial-gradient(circle at 80% 4%, rgba(240, 219, 197, 0.65), transparent 45%),
-    radial-gradient(circle at 78% 78%, rgba(221, 210, 191, 0.55), transparent 50%);
 }
 
 .top-bar {
