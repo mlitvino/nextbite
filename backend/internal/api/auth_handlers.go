@@ -8,19 +8,21 @@ import (
 )
 
 type createUserRequest struct {
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Name     string `json:"name" binding:"required"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type loginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 const (
-	cookieName          = "nextbite_session"
-	cookieMaxAgeSeconds = 3600
+	cookieName           = "nextbite_session"
+	cookieMaxAgeSeconds  = 3600
+	createUserRequestKey = "createUserRequest"
+	loginRequestKey      = "loginRequest"
 )
 
 func (h *Handler) PostUsers(c *gin.Context) {
@@ -32,13 +34,8 @@ func (h *Handler) PostSignup(c *gin.Context) {
 }
 
 func (h *Handler) handleSignup(c *gin.Context) {
-	var req createUserRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
-		return
-	}
-	if req.Name == "" || req.Username == "" || req.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "name, username, and password are required"})
+	req, ok := getCreateUserRequest(c)
+	if !ok {
 		return
 	}
 
@@ -60,13 +57,8 @@ func (h *Handler) handleSignup(c *gin.Context) {
 }
 
 func (h *Handler) PostLogin(c *gin.Context) {
-	var req loginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
-		return
-	}
-	if req.Username == "" || req.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "username and password are required"})
+	req, ok := getLoginRequest(c)
+	if !ok {
 		return
 	}
 
@@ -110,6 +102,38 @@ func (h *Handler) GetMe(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, current)
+}
+
+func getCreateUserRequest(c *gin.Context) (createUserRequest, bool) {
+	value, ok := c.Get(createUserRequestKey)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "missing create user request"})
+		return createUserRequest{}, false
+	}
+
+	req, ok := value.(createUserRequest)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid create user request"})
+		return createUserRequest{}, false
+	}
+
+	return req, true
+}
+
+func getLoginRequest(c *gin.Context) (loginRequest, bool) {
+	value, ok := c.Get(loginRequestKey)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "missing login request"})
+		return loginRequest{}, false
+	}
+
+	req, ok := value.(loginRequest)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid login request"})
+		return loginRequest{}, false
+	}
+
+	return req, true
 }
 
 func (h *Handler) RequireAuth() gin.HandlerFunc {
